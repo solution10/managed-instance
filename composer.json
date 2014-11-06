@@ -1,0 +1,28 @@
+{
+    "name": "solution10/managed-instance",
+    "description": "A simple trait to allow classes to manage their own instances. DI on the cheap.",
+    "minimum-stability": "stable",
+    "keywords": ["component", "instances"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Gisby",
+            "email": "alex@solution10.com"
+        }
+    ],
+    "require": {
+        "php": ">= 5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.1",
+        "squizlabs/php_codesniffer": "~1.0",
+        "satooshi/php-coveralls": "dev-master",
+        "apigen/apigen": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Solution10\\ManagedInstance\\": "src",
+            "Solution10\\ManagedInstance\\Tests\\": "tests"
+        }
+    }
+}
