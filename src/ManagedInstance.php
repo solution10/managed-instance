@@ -68,6 +68,14 @@ trait ManagedInstance
     }
 
     /**
+     * Clears out all of the instances in the manager
+     */
+    public static function clearInstances()
+    {
+        self::$instances = [];
+    }
+
+    /**
      * Get/Set the name of this instance
      *
      * @param   string|null     $name   String to set, null to get
