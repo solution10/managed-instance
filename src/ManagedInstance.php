@@ -28,6 +28,7 @@ trait ManagedInstance
      *
      * @param   string|null  Either the instance by a given name, or the default one for singletons.
      * @return  self
+     * @throws  Exception\InstanceException
      */
     public static function instance($name = null)
     {
@@ -36,25 +37,13 @@ trait ManagedInstance
         }
 
         if (!array_key_exists($name, self::$instances)) {
-            self::$instances[$name] = self::instanceFactory($name);
-            self::$instances[$name]->instanceName($name);
+            throw new Exception\InstanceException(
+                'Unknown instance "'.$name.'"',
+                Exception\InstanceException::UNKNOWN_INSTANCE
+            );
         }
 
         return self::$instances[$name];
-    }
-
-    /**
-     * Returns a new instance of the class this trait is attached to.
-     * This is your factory, or override point if you do something weird
-     * just after construction.
-     *
-     * @param   string  $name   The name that this instance is being saved under.
-     * @return  self
-     */
-    protected static function instanceFactory($name)
-    {
-        $class = get_called_class();
-        return new $class();
     }
 
     /**

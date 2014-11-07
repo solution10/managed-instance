@@ -23,8 +23,33 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testRegisterDefaultInstance()
+    {
+        $instance = new MockInstance();
+        $this->assertEquals($instance, $instance->registerInstance());
+
+        $default = MockInstance::instance();
+        $this->assertEquals($instance, $default);
+    }
+
+    public function testRegisterNamedInstance()
+    {
+        $named = new MockInstance();
+        $this->assertEquals($named, $named->registerInstance('named'));
+
+        $i = new MockInstance();
+        $i->registerInstance();
+
+        $default = MockInstance::instance();
+        $this->assertNotEquals($named, $default);
+        $this->assertEquals($named, MockInstance::instance('named'));
+    }
+
     public function testDefaultInstance()
     {
+        $i = new MockInstance();
+        $i->registerInstance();
+
         $instance = MockInstance::instance();
         $this->assertInstanceOf('MockInstance', $instance);
         $this->assertEquals('default', $instance->instanceName());
@@ -32,13 +57,28 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
 
     public function testNamedInstances()
     {
+        $i = new MockInstance();
+        $i->registerInstance('test');
+
         $instance = MockInstance::instance('test');
         $this->assertInstanceOf('MockInstance', $instance);
         $this->assertEquals('test', $instance->instanceName());
     }
 
+    /**
+     * @expectedException       \Solution10\ManagedInstance\Exception\InstanceException
+     * @expectedExceptionCode   \Solution10\ManagedInstance\Exception\InstanceException::UNKNOWN_INSTANCE
+     */
+    public function testUnknownInstance()
+    {
+        MockInstance::instance('unknown');
+    }
+
     public function testInstanceReuse()
     {
+        $i = new MockInstance();
+        $i->registerInstance('test');
+
         $instance1 = MockInstance::instance('test');
         $instance1->mark = 'green';
 
@@ -58,6 +98,14 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
 
     public function testInstances()
     {
+        $d = new MockInstance();
+        $d->registerInstance();
+        $b = new MockInstance();
+        $b->registerInstance('blue');
+        $g = new MockInstance();
+        $g->registerInstance('green');
+
+
         $default = MockInstance::instance();
         $blue = MockInstance::instance('blue');
         $green = MockInstance::instance('green');
@@ -68,25 +116,6 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($default, $instances['default']);
         $this->assertEquals($blue, $instances['blue']);
         $this->assertEquals($green, $instances['green']);
-    }
-
-    public function testRegisterDefaultInstance()
-    {
-        $instance = new MockInstance();
-        $this->assertEquals($instance, $instance->registerInstance());
-
-        $default = MockInstance::instance();
-        $this->assertEquals($instance, $default);
-    }
-
-    public function testRegisterNamedInstance()
-    {
-        $named = new MockInstance();
-        $this->assertEquals($named, $named->registerInstance('named'));
-
-        $default = MockInstance::instance();
-        $this->assertNotEquals($named, $default);
-        $this->assertEquals($named, MockInstance::instance('named'));
     }
     
     public function testUnregisterInstance()
