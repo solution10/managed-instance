@@ -4,6 +4,7 @@ namespace Solution10\ManagedInstance\Tests;
 
 use PHPUnit_Framework_TestCase;
 use MockInstance;
+use Solution10\ManagedInstance\Exception\InstanceException;
 
 class ManagedInstanceTest extends PHPUnit_Framework_TestCase
 {
@@ -91,9 +92,28 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
     {
         $mock = new MockInstance();
 
-        $this->assertEquals('default', $mock->instanceName());
+        $this->assertEquals(null, $mock->instanceName());
         $this->assertEquals($mock, $mock->instanceName('blue'));
         $this->assertEquals('blue', $mock->instanceName());
+    }
+
+    public function testInstanceRenaming()
+    {
+        $i = new MockInstance();
+        $i->registerInstance('test1');
+
+        $i->instanceName('test2');
+
+        $caught = false;
+        try {
+            MockInstance::instance('test1');
+        } catch (InstanceException $e) {
+            $caught = true;
+            $this->assertEquals(InstanceException::UNKNOWN_INSTANCE, $e->getCode());
+        }
+
+        $this->assertTrue($caught);
+        $this->assertEquals($i, MockInstance::instance('test2'));
     }
 
     public function testInstances()
@@ -129,5 +149,27 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
         // Now unregister and make sure it's gone
         $this->assertEquals($instance1, $instance1->unregisterInstance());
         $this->assertCount(0, MockInstance::instances());
+    }
+
+    public function testGuardAgainstCrossPollenation()
+    {
+        $this->getMockForTrait(
+            'Solution10\ManagedInstance\ManagedInstance',
+            [],
+            'MockInstanceOne'
+        );
+
+        $this->getMockForTrait(
+            'Solution10\ManagedInstance\ManagedInstance',
+            [],
+            'MockInstanceTwo'
+        );
+
+        $i = new \MockInstanceOne();
+        $i->registerInstance();
+
+        // make sure that MockInstanceTwo doesn't know about MockInstanceOne's instances:
+        $this->assertCount(1, \MockInstanceOne::instances());
+        $this->assertCount(0, \MockInstanceTwo::instances());
     }
 }

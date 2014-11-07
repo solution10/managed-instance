@@ -20,7 +20,7 @@ trait ManagedInstance
     /**
      * @var     string
      */
-    protected $instanceName = 'default';
+    protected $instanceName;
 
     /**
      * Returns an instance of this object, by a given name (null for default). If one doesn't exist, it will
@@ -75,7 +75,11 @@ trait ManagedInstance
         if ($name === null) {
             return $this->instanceName;
         }
+
+        // Rename:
+        unset(self::$instances[$this->instanceName]);
         $this->instanceName = $name;
+        self::$instances[$name] = $this;
         return $this;
     }
 
@@ -91,7 +95,6 @@ trait ManagedInstance
         if ($name === null) {
             $name = 'default';
         }
-        self::$instances[$name] = $this;
         $this->instanceName($name);
         return $this;
     }
@@ -105,6 +108,7 @@ trait ManagedInstance
     {
         if (array_key_exists($this->instanceName, self::$instances)) {
             unset(self::$instances[$this->instanceName]);
+            unset($this->instanceName);
         }
         return $this;
     }

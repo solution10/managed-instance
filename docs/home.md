@@ -4,7 +4,7 @@ Managed Instance is a tiny trait that allows you to give classes the ability to
 manage instances of themselves. This allows you to create singletons, or use them
 as lazy-DI containers by hot-swapping out instances by name.
 
-## Usage
+## Integration
 
 Let's say I have a class called "Auth" that I want to have multiple instances of itself,
 all of which should be managed through the class.
@@ -47,7 +47,11 @@ class Auth
 }
 ```
 
-Now I can register instances of my Auth class with the manager:
+Now I can register instances of my Auth class with the manager.
+
+## Registering Instances
+
+Before I can recall an instance, I need to first register it:
 
 ```php
 $defaultAuth = new Auth();
@@ -70,5 +74,35 @@ up the instance before registering it with `registerInstance`.
 
 You can then get your instances back out with the static `instance()` method.
 
-## Constructors
+## Unregistering Instances
 
+I might also want to un-register an instance that has previously been registered. That's not a problem:
+
+```php
+$instanceToDelete->unregisterInstance();
+```
+
+## Fetching All Instances
+
+You might want to fetch every instance that the class knows about. Not a problem.
+
+```php
+$instances = Auth::instances();
+```
+
+This will return a map of each instance with the key as it's name.
+
+## Getting/Setting Instance Names
+
+You can also read the name of an instance, or even rename it entirely:
+
+```php
+$instance = Auth::instance('myOtherInstance');
+echo $instance->instanceName();
+
+// now change it:
+$instance->instanceName('mySuperInstance');
+
+// now to read it, you need to do:
+$instance2 = Auth::instance('mySuperInstance');
+```
