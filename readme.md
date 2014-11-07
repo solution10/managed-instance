@@ -2,8 +2,8 @@
 
 Allows classes to manage instances of themselves either as singletons or "lazy DI" containers.
 
-[![Build Status](https://travis-ci.org/solution10/managed-instance.svg?branch=master)](https://travis-ci.org/solution10/managed-instance)
-[![Coverage Status](https://coveralls.io/repos/solution10/managed-instance/badge.png)](https://coveralls.io/r/solution10/managed-instance)
+[![Build Status](https://travis-ci.org/Solution10/managed-instance.svg?branch=master)](https://travis-ci.org/Solution10/managed-instance)
+[![Coverage Status](https://coveralls.io/repos/Solution10/managed-instance/badge.png)](https://coveralls.io/r/Solution10/managed-instance)
 
 [![Latest Stable Version](https://poser.pugx.org/solution10/managed-instance/v/stable.svg)](https://packagist.org/packages/solution10/managed-instance)
 [![Total Downloads](https://poser.pugx.org/solution10/managed-instance/downloads.svg)](https://packagist.org/packages/solution10/managed-instance)
