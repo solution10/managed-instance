@@ -17,7 +17,7 @@ Installation is via composer, in the usual manner:
 ```json
 {
     "require": {
-        "solution10/managed-instance": "1.*"
+        "solution10/managed-instance": "~1.0"
     }
 }
 ```
