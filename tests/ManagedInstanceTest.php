@@ -2,67 +2,54 @@
 
 namespace Solution10\ManagedInstance\Tests;
 
-use Solution10\ManagedInstance\ManagedInstance;
 use PHPUnit_Framework_TestCase;
+use MockInstance;
 
 class ManagedInstanceTest extends PHPUnit_Framework_TestCase
 {
-    public function tearDown()
-    {
-        if (class_exists('\NamedMockInstance')) {
-            \NamedMockInstance::clearInstances();
-        }
-    }
-
-    public function testDefaultInstance()
+    public function setUp()
     {
         $this->getMockForTrait(
             'Solution10\ManagedInstance\ManagedInstance',
             [],
             'MockInstance'
         );
+    }
+    
+    public function tearDown()
+    {
+        if (class_exists('MockInstance')) {
+            MockInstance::clearInstances();
+        }
+    }
 
-        $instance = \MockInstance::instance();
+    public function testDefaultInstance()
+    {
+        $instance = MockInstance::instance();
         $this->assertInstanceOf('MockInstance', $instance);
         $this->assertEquals('default', $instance->instanceName());
     }
 
     public function testNamedInstances()
     {
-        $this->getMockForTrait(
-            'Solution10\ManagedInstance\ManagedInstance',
-            [],
-            'NamedMockInstance'
-        );
-
-        $instance = \NamedMockInstance::instance('test');
-        $this->assertInstanceOf('NamedMockInstance', $instance);
+        $instance = MockInstance::instance('test');
+        $this->assertInstanceOf('MockInstance', $instance);
         $this->assertEquals('test', $instance->instanceName());
     }
 
     public function testInstanceReuse()
     {
-        $this->getMockForTrait(
-            'Solution10\ManagedInstance\ManagedInstance',
-            [],
-            'NamedMockInstance'
-        );
-
-        $instance1 = \NamedMockInstance::instance('test');
+        $instance1 = MockInstance::instance('test');
         $instance1->mark = 'green';
 
-        $instance2 = \NamedMockInstance::instance('test');
+        $instance2 = MockInstance::instance('test');
         $this->assertEquals($instance1, $instance2);
         $this->assertEquals('green', $instance2->mark);
     }
 
     public function testSetGetInstanceName()
     {
-        $mock = $this->getMockForTrait(
-            'Solution10\ManagedInstance\ManagedInstance',
-            [],
-            'NamedMockInstance'
-        );
+        $mock = new MockInstance();
 
         $this->assertEquals('default', $mock->instanceName());
         $this->assertEquals($mock, $mock->instanceName('blue'));
@@ -71,17 +58,11 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
 
     public function testInstances()
     {
-        $this->getMockForTrait(
-            'Solution10\ManagedInstance\ManagedInstance',
-            [],
-            'NamedMockInstance'
-        );
+        $default = MockInstance::instance();
+        $blue = MockInstance::instance('blue');
+        $green = MockInstance::instance('green');
 
-        $default = \NamedMockInstance::instance();
-        $blue = \NamedMockInstance::instance('blue');
-        $green = \NamedMockInstance::instance('green');
-
-        $instances = \NamedMockInstance::instances();
+        $instances = MockInstance::instances();
 
         $this->assertCount(3, $instances);
         $this->assertEquals($default, $instances['default']);
@@ -89,8 +70,35 @@ class ManagedInstanceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($green, $instances['green']);
     }
 
-    public function testRegisterInstance()
+    public function testRegisterDefaultInstance()
     {
+        $instance = new MockInstance();
+        $this->assertEquals($instance, $instance->registerInstance());
 
+        $default = MockInstance::instance();
+        $this->assertEquals($instance, $default);
+    }
+
+    public function testRegisterNamedInstance()
+    {
+        $named = new MockInstance();
+        $this->assertEquals($named, $named->registerInstance('named'));
+
+        $default = MockInstance::instance();
+        $this->assertNotEquals($named, $default);
+        $this->assertEquals($named, MockInstance::instance('named'));
+    }
+    
+    public function testUnregisterInstance()
+    {
+        $instance1 = new MockInstance();
+        $instance1->registerInstance('i1');
+
+        $regdInstance = MockInstance::instance('i1');
+        $this->assertEquals($instance1, $regdInstance);
+
+        // Now unregister and make sure it's gone
+        $this->assertEquals($instance1, $instance1->unregisterInstance());
+        $this->assertCount(0, MockInstance::instances());
     }
 }
