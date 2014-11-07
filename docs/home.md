@@ -47,13 +47,28 @@ class Auth
 }
 ```
 
-Now I can create new instances of Auth as simply as this:
+Now I can register instances of my Auth class with the manager:
 
 ```php
-$defaultInstance = Auth::instance();
+$defaultAuth = new Auth();
+$defaultAuth->registerInstance(); // Registers this as the 'default' instance
 
-$anotherInstance = Auth::instance('myOtherInstance');
+$defaultInstance = Auth::instance(); // Fetches the 'default' instance.
+
+// $defaultAuth === $defaultInstance
+
+$anotherAuth = new Auth();
+$anotherAuth->registerInstance('myOtherInstance'); // Registers 'myOtherInstance'
+
+$anotherInstance = Auth::instance('myOtherInstance'); // Returns 'myOtherInstance' instance.
+
+// $anotherAuth === $anotherInstance
 ```
+
+As you can see, ManagedInstance does not provide a factory for you. It's up to you to construct and set
+up the instance before registering it with `registerInstance`.
+
+You can then get your instances back out with the static `instance()` method.
 
 ## Constructors
 
